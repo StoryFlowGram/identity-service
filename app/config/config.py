@@ -17,6 +17,7 @@ def database_url():
 
 
 JWT_SECRET = os.getenv("JWT_SECRET")
+SECRET_KEY = os.getenv("SECRET_KEY")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS"))
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")

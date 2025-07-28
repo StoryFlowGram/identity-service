@@ -58,7 +58,7 @@ class UserRepository(UserProtocol):
         result = await self.session_factory.execute(stmt)
         orm = result.scalars().first()
         if not orm:
-            raise ValueError("Почта пользователя не найдена")
+            return None
         
         return DomainUser(
             id=orm.id,
@@ -76,7 +76,7 @@ class UserRepository(UserProtocol):
         result = await self.session_factory.execute(stmt)
         orm = result.scalars().first()
         if not orm:
-            raise ValueError("Google id пользователя не найден")
+            return None
     
         return DomainUser(
             id=orm.id,

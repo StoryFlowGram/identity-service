@@ -21,7 +21,7 @@ class User(Base):
     def validate_telegram_id(self, key, telegram_id):
         if telegram_id is not None and telegram_id < 0:
             raise ValueError("Telegram id должен быть больше нуля")
-        elif not telegram_id:
+        elif telegram_id is not None and not telegram_id:
             raise ValueError("Telegram id не может быть пустым")
         return telegram_id
     
