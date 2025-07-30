@@ -71,6 +71,24 @@ class UserRepository(UserProtocol):
             avatar_url=orm.avatar_url
         )
         
+    async def get_by_id(self, id_pk):
+        stmt = select(UserModel).where(UserModel.id == id_pk)
+        result = await self.session_factory.execute(stmt)
+        orm = result.scalars().first()
+        if not orm:
+            return None
+        
+        return DomainUser(
+            id=orm.id,
+            telegram_id=orm.telegram_id,
+            google_id=orm.google_id,
+            email=orm.email,
+            first_name=orm.first_name,
+            last_name=orm.last_name,
+            username=orm.username,
+            avatar_url=orm.avatar_url
+        )
+
     async def get_by_google_id(self, google_id: str):
         stmt = select(UserModel).where(UserModel.google_id == google_id)
         result = await self.session_factory.execute(stmt)
@@ -92,11 +110,24 @@ class UserRepository(UserProtocol):
     async def update_profile(self, user_id: int, first_name: str, last_name: Optional[str], username: Optional[str], avatar_url: Optional[str]):
         stmt = update(UserModel).where(UserModel.id == user_id).values(
             first_name=first_name, last_name=last_name, username=username, avatar_url=avatar_url
-            )
-        result = await self.session_factory.execute(stmt)
+        )
+        await self.session_factory.execute(stmt)
         await self.session_factory.commit()
-        await self.session_factory.refresh(result)
-        return result
+        
+        stmt = select(UserModel).where(UserModel.id == user_id)
+        result = await self.session_factory.execute(stmt)
+        orm = result.scalars().one()
+        
+        return DomainUser(
+            id=orm.id,
+            telegram_id=orm.telegram_id,
+            google_id=orm.google_id,
+            email=orm.email,
+            first_name=orm.first_name,
+            last_name=orm.last_name,
+            username=orm.username,
+            avatar_url=orm.avatar_url
+        )
     
     async def update_google_account(self, user_id: int, google_id: str, email:str):
         stmt = update(UserModel).where(UserModel.id == user_id).values(

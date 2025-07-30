@@ -23,6 +23,10 @@ class UserProtocol(ABC):
         ...
 
     @abstractmethod
+    async def get_by_id(self, id_pk: int):
+        ...    
+
+    @abstractmethod
     async def update_profile(
         self, 
         user_id: int,
