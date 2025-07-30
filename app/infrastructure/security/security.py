@@ -10,7 +10,7 @@ class SecurityService:
     def create_token(user_id: int):
         expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         payload = {
-            "sub": user_id,
+            "sub": str(user_id),
             "exp": expire,
             "iat": datetime.now(timezone.utc)
         }
@@ -22,7 +22,7 @@ class SecurityService:
     def create_refresh_token(user_id: int):
         expire = datetime.now(timezone.utc) + timedelta(minutes=REFRESH_TOKEN_EXPIRE_DAYS)
         payload = {
-            "sub": user_id,
+            "sub": str(user_id),
             "exp": expire,
             "iat": datetime.now(timezone.utc)
         }
