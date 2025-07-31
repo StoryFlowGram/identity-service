@@ -135,8 +135,19 @@ class UserRepository(UserProtocol):
         )
         result = await self.session_factory.execute(stmt)
         await self.session_factory.commit()
-        await self.session_factory.refresh(result)
-        return result
+        stmt_select = select(UserModel).where(UserModel.id == user_id)
+        result = await self.session_factory.execute(stmt_select)
+        orm = result.scalars().one()
+        return DomainUser(
+            orm.id,
+            orm.telegram_id,
+            orm.google_id,
+            orm.email,
+            orm.first_name,
+            orm.last_name,
+            orm.username,
+            orm.avatar_url 
+        )
     
     async def delete(self, id_pk: int):
         stmt = delete(UserModel).where(UserModel.id == id_pk)

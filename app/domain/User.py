@@ -6,7 +6,7 @@ from typing import Optional
 @dataclass(slots=True, frozen=True)
 class User:
     id: int
-    telegram_id: int
+    telegram_id: Optional[int]
     google_id: Optional[str]
     email: Optional[str]
     first_name: str
