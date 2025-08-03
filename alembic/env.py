@@ -13,6 +13,9 @@ load_dotenv(override=True)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
+url = os.getenv("DATABASE_URL")
+if url and url.startswith("postgresql+asyncpg"):
+    url = url.replace("postgresql+asyncpg", "postgresql+psycopg2")
 config = context.config
 config.set_main_option("sqlalchemy.url", str(os.getenv("DATABASE_URL")))
 
