@@ -20,7 +20,7 @@ class SecurityService:
 
     @staticmethod
     def create_refresh_token(user_id: int):
-        expire = datetime.now(timezone.utc) + timedelta(minutes=REFRESH_TOKEN_EXPIRE_DAYS)
+        expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
         payload = {
             "sub": str(user_id),
             "exp": expire,

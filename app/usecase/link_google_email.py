@@ -28,6 +28,14 @@ class LinkGoogleEmailUseCase:
         if not user:
             raise ValueError("Пользователь не найден")
         
+        if user.google_id:
+            raise ValueError("У вас уже привязан Google-аккаунт. Сначала отвяжите его.")
+        
+        check_google_id = await self.protocol.get_by_google_id(google_id)
+        if check_google_id and check_google_id.id != user.id:
+            raise ValueError("Указанный Google-аккаунт уже привязан к другому пользователю.")
+        
+        
         linked = await self.protocol.update_google_account(
             user_id=jwt_user_id,
             google_id=google_id,
