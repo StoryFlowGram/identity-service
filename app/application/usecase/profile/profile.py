@@ -1,9 +1,9 @@
-from app.interfaces.protocols.user_protocol import UserProtocol
+from app.domain.protocols.user_protocol import AbstractUserProtocol
 
 
 
 class ProfileUseCase:
-    def __init__(self, protocol: UserProtocol):
+    def __init__(self, protocol: AbstractUserProtocol):
         self.protocol = protocol
 
 

@@ -1,9 +1,9 @@
-from app.interfaces.protocols.user_protocol import UserProtocol
-from app.interfaces.dto.update_profile import UpdateProfileDTO
+from app.domain.protocols.user_protocol import AbstractUserProtocol
+from app.application.dto.profile.update_profile import UpdateProfileDTO
 
 
 class UpdateProfileUseCase:
-    def __init__(self, protocol: UserProtocol):
+    def __init__(self, protocol: AbstractUserProtocol):
         self.protocol = protocol
 
 
