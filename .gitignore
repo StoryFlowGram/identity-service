@@ -109,6 +109,7 @@ ipython_config.py
 #poetry.toml
 
 # pdm
+
 #   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
 #   pdm recommends including project-wide configuration in pdm.toml, but excluding .pdm-python.
 #   https://pdm-project.org/en/latest/usage/project/#working-with-version-control
@@ -193,6 +194,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+todo
 
 # Cursor
 #  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
