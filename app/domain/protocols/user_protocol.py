@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+from app.domain.entities.user import User
 
-from app.domain.User import User
 
-
-class UserProtocol(ABC):
+class AbstractUserProtocol(ABC):
 
     @abstractmethod
     async def add(self, user: User):
@@ -49,5 +48,3 @@ class UserProtocol(ABC):
     @abstractmethod
     async def delete(self, id_pk: int):
         ...
-
-    
