@@ -24,10 +24,8 @@ class AuthViaTelegramUsecase:
                 avatar_url=None,
             )
             user = await self.protocol.add(user)
-        else:
-            return user
 
-        create_token = self.jwt_token_service.create_token(user.id)
+        create_token = self.jwt_token_service.create_token(user.id, user.telegram_id)
         create_refresh_token = self.jwt_token_service.create_refresh_token(user.id)
         return AuthTelegramDTO(
             access_token=create_token,

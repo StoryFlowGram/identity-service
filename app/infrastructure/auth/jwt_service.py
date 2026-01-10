@@ -9,6 +9,7 @@ from app.config.config import (
     JWT_ALGORITHM,
     ACCESS_TOKEN_EXPIRE_MINUTES,
     REFRESH_TOKEN_EXPIRE_DAYS,
+    TELEGRAM_ADMIN_ID,
 )
 
 
@@ -19,13 +20,19 @@ class JWTTokenService(AbstractJWTTokenService):
         self.algorithm = JWT_ALGORITHM
         self.access_token_expire_minutes = ACCESS_TOKEN_EXPIRE_MINUTES
         self.refresh_token_expire_days = REFRESH_TOKEN_EXPIRE_DAYS
+        self.telegram_admin_id = TELEGRAM_ADMIN_ID
 
-    def create_token(self, user_id: int):
+    def create_token(self, user_id: int, telegram_id: int | None = None):
         expire = datetime.now(timezone.utc) + timedelta(minutes=self.access_token_expire_minutes)
+        role = "user"
+        if telegram_id == self.telegram_admin_id:
+            role = "admin"
+
         payload = {
             "sub": str(user_id),
             "exp": expire,
             "iat": datetime.now(timezone.utc),
+            "role": role,
             "type": "access",
         }
         token = jwt.encode(payload, self.secret, algorithm=self.algorithm)
