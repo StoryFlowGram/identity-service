@@ -5,7 +5,7 @@ from app.presentation.api.v1.link_google_controller import link_google_router
 from app.infrastructure.database.engine import engine
 from app.infrastructure.database.base import Base
 from app.presentation.middleware.cors import setup_cors
-from app.presentation.middleware.session import setup_session_middleware
+from app.presentation.middleware.session import setup_session_middleware, setup_proxy_middleware
 from app.presentation.api import depends
 from app.infrastructure import di
 
@@ -13,6 +13,7 @@ app = FastAPI(title="identity-service")
 
 
 setup_cors(app)
+setup_proxy_middleware(app)
 setup_session_middleware(app)
 
 app.include_router(auth_router)

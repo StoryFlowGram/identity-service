@@ -1,38 +1,37 @@
+from loguru import logger
 from app.domain.entities.user import User
 from app.domain.protocols.user_protocol import AbstractUserProtocol
 from app.application.interfaces.token_service import AbstractJWTTokenService
-from app.application.interfaces.oauth_service import AbstractOauthService
+from app.application.interfaces.oauth_service import AbstractGoogleOAuthService
 from app.application.dto.auth.auth_google import AuthGoogleDTO
 
 class AuthViaGoogleUsecase:
-    def __init__(self, protocol: AbstractUserProtocol, jwt_token_service: AbstractJWTTokenService, oauth_client_instance: AbstractOauthService):
+    def __init__(self, protocol: AbstractUserProtocol, jwt_token_service: AbstractJWTTokenService, google_service: AbstractGoogleOAuthService):
         self.protocol = protocol
         self.jwt_token_service = jwt_token_service
-        self.oauth_client_instance = oauth_client_instance
+        self.google_service = google_service
 
-    async def __call__(self, request):
+    async def __call__(self, code: str, redirect_uri: str) -> AuthGoogleDTO:
 
-        user_info = await self.oauth_client_instance.get_user_info(request)
+        try:
+            user_info = await self.google_service.get_user_data(code, redirect_uri)
+        except Exception as e:
+            raise ValueError(f"Ошибка при получении данных о пользователе {str(e)}") 
 
-        google_id = user_info.get("sub")
-        email = user_info.get("email")
-        first_name = user_info.get("given_name")
-        last_name = user_info.get("family_name")
-        avatar_url = user_info.get("picture")
-
-        user = await self.protocol.get_by_google_id(google_id)
-        if user is None:
-            user = User(
+        user = await self.protocol.get_by_google_id(user_info.google_id)
+        if user is None: 
+            new_user = User(
                 id=0,
                 telegram_id=None,
-                google_id=google_id,
-                email=email,
-                first_name=first_name,
-                last_name=last_name,
-                username=None,
-                avatar_url=avatar_url
+                google_id=user_info.google_id,
+                email=user_info.email,
+                first_name=user_info.first_name,
+                last_name=user_info.last_name,
+                username=user_info.email.split("@")[0],
+                avatar_url=user_info.avatar_url
             )
-            user = await self.protocol.add(user)
+            user = await self.protocol.add(new_user)
+            logger.info(f"Создан новый пользователь через Google: {user.email} (ID: {user.id})")
 
         access_token = self.jwt_token_service.create_token(user.id)
         refresh_token = self.jwt_token_service.create_refresh_token(user.id)

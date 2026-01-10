@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 class AbstractJWTTokenService(ABC):
     
     @abstractmethod
-    def create_token(self, user_id: int):
+    def create_token(self, user_id: int, telegram_id: int | None = None):
         ...
 
     @abstractmethod

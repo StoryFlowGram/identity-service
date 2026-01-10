@@ -1,11 +1,14 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from pydantic import BaseModel
 
-class AbstractOauthService(ABC):
+class GoogleUserData(BaseModel):
+    email: str
+    google_id: str
+    first_name: str
+    last_name: str | None = None
+    avatar_url: str | None = None
+
+class AbstractGoogleOAuthService(ABC):
     @abstractmethod
-    async def get_user_info(self, access_token: str):
-        raise NotImplementedError
-    
-    @abstractmethod
-    async def get_authorize_redirect(self, request: Any, redirect_uri: str):
-        raise NotImplementedError
+    async def get_user_data(self, code: str, redirect_uri: str) -> GoogleUserData:
+        pass
