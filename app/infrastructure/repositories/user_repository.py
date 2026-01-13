@@ -4,7 +4,7 @@ from typing import Optional
 
 from app.domain.protocols.user_protocol import AbstractUserProtocol
 from app.infrastructure.models.user_models import User as UserModel
-from app.domain.entities.user import User as DomainUser
+from app.domain.entities import User as DomainUser
 from app.infrastructure.mappers.user_mapper import orm_to_domain, domain_to_orm
 
 

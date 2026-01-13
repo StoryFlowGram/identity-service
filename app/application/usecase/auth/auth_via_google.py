@@ -1,5 +1,5 @@
 from loguru import logger
-from app.domain.entities.user import User
+from app.domain.entities import User
 from app.domain.protocols.user_protocol import AbstractUserProtocol
 from app.application.interfaces.token_service import AbstractJWTTokenService
 from app.application.interfaces.oauth_service import AbstractGoogleOAuthService

@@ -1,4 +1,4 @@
-from app.domain.entities.user import User as DomainUser
+from app.domain.entities import User as DomainUser
 from app.infrastructure.models.user_models import User as UserModel
 
 
