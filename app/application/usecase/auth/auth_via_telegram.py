@@ -1,4 +1,4 @@
-from app.domain.entities import User
+from app.domain.entities.User import User
 from app.domain.protocols.user_protocol import AbstractUserProtocol
 from app.application.interfaces.token_service import AbstractJWTTokenService
 from app.application.dto.auth.auth_telegram import AuthTelegramDTO
