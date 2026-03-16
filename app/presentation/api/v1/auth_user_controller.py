@@ -73,7 +73,7 @@ async def auth_via_google_popup(
             value=auth_google_usecase.access_token,
             httponly=True,
             samesite="none",
-            secure=False,
+            secure=True,
             max_age=900
         )
         response.set_cookie(
@@ -81,7 +81,7 @@ async def auth_via_google_popup(
             value=auth_google_usecase.refresh_token,
             httponly=True,
             samesite="none",
-            secure=False,
+            secure=True,
             max_age=14*24*60*60
         )
         return auth_google_usecase
@@ -108,7 +108,7 @@ async def refresh_tokens(
             value=tokens.access_token,
             httponly=True,
             samesite="none",
-            secure=False,
+            secure=True,
             max_age=900
         )
         response.set_cookie(
@@ -116,7 +116,7 @@ async def refresh_tokens(
             value=tokens.refresh_token,
             httponly=True,
             samesite="none",
-            secure=False,
+            secure=True,
             max_age=14*24*60*60
         )
         return tokens
