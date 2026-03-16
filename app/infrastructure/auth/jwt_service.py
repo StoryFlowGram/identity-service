@@ -4,23 +4,17 @@ from jwt import ExpiredSignatureError, InvalidTokenError
 from loguru import logger
 
 from app.application.interfaces.token_service import AbstractJWTTokenService
-from app.config.config import (
-    JWT_SECRET,
-    JWT_ALGORITHM,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-    REFRESH_TOKEN_EXPIRE_DAYS,
-    TELEGRAM_ADMIN_ID,
-)
+from app.infrastructure.config.config import config
 
 
 class JWTTokenService(AbstractJWTTokenService):
 
     def __init__(self):
-        self.secret = JWT_SECRET
-        self.algorithm = JWT_ALGORITHM
-        self.access_token_expire_minutes = ACCESS_TOKEN_EXPIRE_MINUTES
-        self.refresh_token_expire_days = REFRESH_TOKEN_EXPIRE_DAYS
-        self.telegram_admin_id = TELEGRAM_ADMIN_ID
+        self.secret = config.jwt.jwt_secret
+        self.algorithm = config.jwt.jwt_algorithm
+        self.access_token_expire_minutes = config.jwt.access_token_expire_minutes
+        self.refresh_token_expire_days = config.jwt.refresh_token_expire_days
+        self.telegram_admin_id = config.jwt.telegram_admin_id
 
     def create_token(self, user_id: int, telegram_id: int | None = None):
         expire = datetime.now(timezone.utc) + timedelta(minutes=self.access_token_expire_minutes)
