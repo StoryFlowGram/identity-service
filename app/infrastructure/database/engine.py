@@ -1,8 +1,9 @@
 from sqlalchemy.ext.asyncio import create_async_engine
-from app.config.config import database_url
+
+from app.infrastructure.config.config import config
 
 
 engine = create_async_engine(
-    url=database_url(),
-    echo=True
+    url=config.db.get_database_url(DB_API="asyncpg"),
+    echo=True,
 )
