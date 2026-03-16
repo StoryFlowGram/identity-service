@@ -1,6 +1,5 @@
 from logging.config import fileConfig
-import os
-from dotenv import load_dotenv
+
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -9,15 +8,15 @@ from app.infrastructure.models.user_models import User
 
 from alembic import context
 
-load_dotenv(override=True)
+from app.infrastructure.config.config import Config
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
-url = os.getenv("DATABASE_URL")
-if url and url.startswith("postgresql+asyncpg"):
-    url = url.replace("postgresql+asyncpg", "postgresql+psycopg2")
+app_config = Config()
+
+
 config = context.config
-config.set_main_option("sqlalchemy.url", str(os.getenv("DATABASE_URL")))
+db_url = str(app_config.db.get_database_url(DB_API="psycopg2"))
+config.set_main_option("sqlalchemy.url", db_url)
+
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
