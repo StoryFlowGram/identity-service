@@ -10,7 +10,7 @@ from app.presentation.schemas.auth.auth_google_schemas import GoogleAuthCodeSche
 
 from app.application.usecase.auth.auth_via_telegram import AuthViaTelegramUsecase
 from app.application.usecase.token.refresh_token import RefreshTokenUseCase
-from app.presentation.schemas.auth.auth_telegram_schemas import  AuthTelegramSchema 
+from app.presentation.schemas.auth.auth_telegram_schemas import  AuthResponseSchema, TelegramAuthRequest
 from app.presentation.schemas.token.token_schemas import TokenRefreshResponseSchema
 from app.presentation.schemas.auth.auth_google_schemas import  GoogleAuthCodeSchema
 from app.presentation.api.depends import get_oauth_service
@@ -25,37 +25,44 @@ auth_router = APIRouter(tags=["Auth"])
 
 
 
-@auth_router.post("/telegram", response_model=AuthTelegramSchema)
+@auth_router.post("/telegram", response_model=AuthResponseSchema)
 async def auth_via_telegram(
-    telegram_schema: AuthTelegramSchema, 
+    request: TelegramAuthRequest, 
     response: Response,
     protocol = Depends(get_user_protocol), 
     jwt_token_service = Depends(get_jwt_token_service)
-    ):
+):
     usecase = AuthViaTelegramUsecase(protocol, jwt_token_service)
     try:
-        created_telegram_user = await usecase(telegram_schema)
+        result = await usecase(request.initData)
+        
+        user = result.user 
+        
         response.set_cookie(
             key="access_token", 
-            value=created_telegram_user.access_token, 
+            value=result.access_token,
             httponly=True,
             samesite="none",
             secure=True,
             max_age=900
         )
 
-
         response.set_cookie(
             key="refresh_token", 
-            value=created_telegram_user.refresh_token, 
+            value=result.refresh_token, 
             httponly=True,
             samesite="none",
             secure=True,
             max_age=14*24*60*60
         )
-        return created_telegram_user
+        
+        return AuthResponseSchema(
+            telegram_id=user.telegram_id,
+            first_name=user.first_name,
+            username=user.username
+        )
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=403, detail="Невірні дані від Telegram")
 
 @auth_router.post("/google")
 async def auth_via_google_popup(
@@ -73,7 +80,7 @@ async def auth_via_google_popup(
             value=auth_google_usecase.access_token,
             httponly=True,
             samesite="none",
-            secure=True,
+            secure=True,    
             max_age=900
         )
         response.set_cookie(

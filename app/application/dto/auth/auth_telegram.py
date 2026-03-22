@@ -1,12 +1,9 @@
 from dataclasses import dataclass
-from typing import Optional
+from app.domain.entities.User import User
 
 
 @dataclass(frozen=True)
 class AuthTelegramDTO:
     access_token: str
     refresh_token: str
-    telegram_id: int
-    first_name: str
-    last_name: Optional[str] = None
-    username: Optional[str] = None
+    user: User

@@ -14,7 +14,8 @@ app_config = Config()
 
 
 config = context.config
-db_url = str(app_config.db.get_database_url(DB_API="psycopg2"))
+url_obj = app_config.db.get_database_url(DB_API="psycopg2")
+db_url = str(url_obj.render_as_string(hide_password=False))
 config.set_main_option("sqlalchemy.url", db_url)
 
 
