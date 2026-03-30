@@ -33,8 +33,12 @@ class AuthViaGoogleUsecase:
             user = await self.protocol.add(new_user)
             logger.info(f"Создан новый пользователь через Google: {user.email} (ID: {user.id})")
 
-        access_token = self.jwt_token_service.create_token(user.id)
-        refresh_token = self.jwt_token_service.create_refresh_token(user.id)
+        access_token = self.jwt_token_service.create_token(
+            user.id,
+            user.telegram_id,
+            user.token_version
+        )
+        refresh_token = self.jwt_token_service.create_refresh_token(user.id, user.token_version)
         
         return AuthGoogleDTO(
             access_token=access_token,

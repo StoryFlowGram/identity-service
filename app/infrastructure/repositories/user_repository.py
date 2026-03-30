@@ -73,6 +73,22 @@ class UserRepository(AbstractUserProtocol):
         result = await self.session_factory.execute(stmt_select)
         orm = result.scalars().one()
         return orm_to_domain(orm)
+
+    async def increment_token_version(self, user_id: int):
+        stmt = (
+            update(UserModel)
+            .where(UserModel.id == user_id)
+            .values(token_version=UserModel.token_version + 1)
+        )
+        await self.session_factory.execute(stmt)
+        await self.session_factory.commit()
+
+        stmt_select = select(UserModel).where(UserModel.id == user_id)
+        result = await self.session_factory.execute(stmt_select)
+        orm = result.scalars().one_or_none()
+        if not orm:
+            return None
+        return orm_to_domain(orm)
     
     async def delete(self, id_pk: int):
         stmt = delete(UserModel).where(UserModel.id == id_pk)

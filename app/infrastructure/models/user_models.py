@@ -14,28 +14,29 @@ class User(Base):
     last_name: Mapped[str] = mapped_column(String, nullable=True)
     username: Mapped[str] = mapped_column(String, nullable=True)
     avatar_url: Mapped[str] = mapped_column(String, nullable=True)
+    token_version: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
     registred_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())  
     
     
     @validates("telegram_id")
     def validate_telegram_id(self, key, telegram_id):
         if telegram_id is not None and telegram_id < 0:
-            raise ValueError("Telegram id должен быть больше нуля")
+            raise ValueError("Telegram id повинен бути більше нуля")
         elif telegram_id is not None and not telegram_id:
-            raise ValueError("Telegram id не может быть пустым")
+            raise ValueError("Telegram id не може бути порожнім")
         return telegram_id
     
 
     @validates("email")
     def validates_email(self, key, email):
         if email is not None and "@" not in email:
-            raise ValueError("Адрес почты не может быть без @")
+            raise ValueError("Адреса почти не може бути без @")
         return email
     
     @validates("first_name")
     def validate_first_name(self, key, first_name):
         if not first_name:
-            raise ValueError("Имя не может быть пустым")
+            raise ValueError("ім'я не може бути пустим")
         return first_name
     
     __table_args__ = (
@@ -44,4 +45,4 @@ class User(Base):
     )
 
     def repr(self):
-        return f"User(id={self.id}, first_name={self.first_name}, last_name={self.last_name}, telegram_id={self.telegram_id}, google_id={self.google_id}, email={self.email}), registred_at={self.registred_at})"
+        return f"User(id={self.id}, first_name={self.first_name}, last_name={self.last_name}, telegram_id={self.telegram_id}, google_id={self.google_id}, email={self.email}, token_version={self.token_version}), registred_at={self.registred_at})"

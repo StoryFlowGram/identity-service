@@ -11,7 +11,8 @@ def orm_to_domain(orm: UserModel) -> DomainUser:
         first_name=orm.first_name,
         last_name=orm.last_name,
         username=orm.username,
-        avatar_url=orm.avatar_url
+        avatar_url=orm.avatar_url,
+        token_version=orm.token_version
     )
 
 def domain_to_orm(domain: DomainUser) -> UserModel:
@@ -22,5 +23,6 @@ def domain_to_orm(domain: DomainUser) -> UserModel:
         first_name=domain.first_name,
         last_name=domain.last_name,
         username=domain.username,
-        avatar_url=domain.avatar_url
+        avatar_url=domain.avatar_url,
+        token_version=domain.token_version
     )

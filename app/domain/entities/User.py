@@ -13,3 +13,4 @@ class User:
     last_name: Optional[str]
     username: Optional[str]
     avatar_url: Optional[str]
+    token_version: int = 0

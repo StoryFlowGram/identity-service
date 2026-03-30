@@ -46,5 +46,9 @@ class AbstractUserProtocol(ABC):
         ...
 
     @abstractmethod
+    async def increment_token_version(self, user_id: int):
+        ...
+
+    @abstractmethod
     async def delete(self, id_pk: int):
         ...

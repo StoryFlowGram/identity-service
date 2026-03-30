@@ -16,7 +16,7 @@ class JWTTokenService(AbstractJWTTokenService):
         self.refresh_token_expire_days = config.jwt.refresh_token_expire_days
         self.telegram_admin_id = config.jwt.telegram_admin_id
 
-    def create_token(self, user_id: int, telegram_id: int | None = None):
+    def create_token(self, user_id: int, telegram_id: int | None = None, token_version: int = 0):
         expire = datetime.now(timezone.utc) + timedelta(minutes=self.access_token_expire_minutes)
         role = "user"
         if telegram_id == self.telegram_admin_id:
@@ -28,41 +28,39 @@ class JWTTokenService(AbstractJWTTokenService):
             "iat": datetime.now(timezone.utc),
             "role": role,
             "type": "access",
+            "token_version": token_version,
         }
-        token = jwt.encode(payload, self.secret, algorithm=self.algorithm)
-        logger.info(f"token: {token}")
-        return token
+        return jwt.encode(payload, self.secret, algorithm=self.algorithm)
 
-    def create_refresh_token(self, user_id: int):
+    def create_refresh_token(self, user_id: int, token_version: int = 0):
         expire = datetime.now(timezone.utc) + timedelta(days=self.refresh_token_expire_days)
         payload = {
             "sub": str(user_id),
             "exp": expire,
             "iat": datetime.now(timezone.utc),
             "type": "refresh",
+            "token_version": token_version,
         }
-        token = jwt.encode(payload, self.secret, algorithm=self.algorithm)
-        logger.info(f"token: {token}")
-        return token
+        return jwt.encode(payload, self.secret, algorithm=self.algorithm)
 
     def decode_token(self, token: str) -> dict:
         try:
-            payload = jwt.decode(
+            return jwt.decode(
                 token,
                 self.secret,
                 algorithms=[self.algorithm],
                 options={"require_iat": True, "require_sub": True},
             )
-            return payload
         except ExpiredSignatureError:
-            raise Exception("Token истёк")
+            logger.warning("Token expired")
+            raise
         except InvalidTokenError:
-            raise Exception("Токен не валидный")
+            logger.warning("Invalid token")
+            raise
 
     def get_user_id(self, token: str) -> int:
-        try:
-            payload = self.decode_token(token)
-            return int(payload["sub"])
-        except Exception as e:
-            logger.error(f"Ошибка при декодировании токена {e}")
-            raise Exception("Невалидный токен")
+        payload = self.decode_token(token)
+        sub = payload.get("sub")
+        if sub is None:
+            raise InvalidTokenError("Token missing subject")
+        return int(sub)
