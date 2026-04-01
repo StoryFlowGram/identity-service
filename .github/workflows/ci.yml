@@ -1,4 +1,4 @@
-name: CI Pipeline
+﻿name: CI Pipeline
 
 on:
   push:
@@ -13,38 +13,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Скачиваем код репозитория
+      - name: РЎРєР°С‡РёРІР°РµРј РєРѕРґ СЂРµРїРѕР·РёС‚РѕСЂРёСЏ
         uses: actions/checkout@v4
 
-      - name: Устанавливаем Python 3.12
+      - name: РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Устанавливаем Poetry
+      - name: РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј Poetry
         run: pip install poetry
 
-      - name: Устанавливаем зависимости проекта
+      - name: РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РїСЂРѕРµРєС‚Р°
   
         run: poetry install --no-interaction --no-root
 
-      - name: Подготовка к сборке Docker-образа
+      - name: РџРѕРґРіРѕС‚РѕРІРєР° Рє СЃР±РѕСЂРєРµ Docker-РѕР±СЂР°Р·Р°
         id: prep
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           echo "image_id=$IMAGE_ID" >> $GITHUB_OUTPUT
 
-      - name: Логинимся в GitHub Container Registry
+      - name: Р›РѕРіРёРЅРёРјСЃСЏ РІ GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }} 
           password: ${{ secrets.GITHUB_TOKEN }} 
 
-      - name: Собираем и пушим Docker-образ в GCR
+      - name: РЎРѕР±РёСЂР°РµРј Рё РїСѓС€РёРј Docker-РѕР±СЂР°Р· РІ GCR
         uses: docker/build-push-action@v5
         with:
             context: .
-            push: true
-            tags: ${{ steps.prep.outputs.image_id }}:latest
+            push: ${{ github.event_name != 'pull_request' }}
+            tags: |
+              ${{ steps.prep.outputs.image_id }}:latest
+              ${{ steps.prep.outputs.image_id }}:sha-${{ github.sha }}
+
