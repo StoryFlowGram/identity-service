@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.presentation.api.v1.auth_user_controller import auth_router 
+from app.presentation.api.v1.internal_controller import internal_router
 from app.presentation.api.v1.profile_controller import profile_router
 from app.presentation.api.v1.link_google_controller import link_google_router
 from app.infrastructure.database.engine import engine
@@ -19,6 +20,7 @@ setup_session_middleware(app)
 app.include_router(auth_router)
 app.include_router(profile_router)
 app.include_router(link_google_router)
+app.include_router(internal_router)
 
 app.dependency_overrides[depends.get_user_protocol] = di.get_user_protocol
 app.dependency_overrides[depends.get_jwt_token_service] = di.get_jwt_token_service

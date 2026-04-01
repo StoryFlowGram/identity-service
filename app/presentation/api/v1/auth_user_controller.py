@@ -1,5 +1,7 @@
-﻿from jwt import PyJWTError
+import logging
+
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
+from jwt import PyJWTError
 
 from app.application.interfaces.token_service import AbstractJWTTokenService
 from app.application.usecase.auth.auth_via_google import AuthViaGoogleUsecase
@@ -7,15 +9,14 @@ from app.application.usecase.auth.auth_via_telegram import AuthViaTelegramUsecas
 from app.application.usecase.token.refresh_token import RefreshTokenUseCase
 from app.domain.protocols.user_protocol import AbstractUserProtocol
 from app.infrastructure.config.config import config
-from app.presentation.api.depends import get_jwt_token_service
-from app.presentation.api.depends import get_oauth_service
-from app.presentation.api.depends import get_user_protocol
+from app.presentation.api.depends import get_jwt_token_service, get_oauth_service, get_user_protocol
 from app.presentation.schemas.auth.auth_google_schemas import GoogleAuthCodeSchema
 from app.presentation.schemas.auth.auth_telegram_schemas import AuthResponseSchema, TelegramAuthRequest
 from app.presentation.schemas.token.token_schemas import TokenRefreshResponseSchema
 
 
 auth_router = APIRouter(tags=["Auth"])
+logger = logging.getLogger(__name__)
 
 ACCESS_COOKIE_MAX_AGE = config.jwt.access_token_expire_minutes * 60
 REFRESH_COOKIE_MAX_AGE = config.jwt.refresh_token_expire_days * 24 * 60 * 60
@@ -66,16 +67,14 @@ async def auth_via_telegram(
     try:
         result = await usecase(request.initData)
         user = result.user
-
         set_auth_cookies(response, result.access_token, result.refresh_token)
-
         return AuthResponseSchema(
             telegram_id=user.telegram_id,
             first_name=user.first_name,
             username=user.username,
         )
     except ValueError:
-        raise HTTPException(status_code=403, detail="Невірні дані авторизації Telegram")
+        raise HTTPException(status_code=403, detail="Invalid Telegram authorization payload")
 
 
 @auth_router.post("/google")
@@ -91,10 +90,11 @@ async def auth_via_google_popup(
         auth_google_usecase = await usecase(schema.code, schema.redirect_uri)
         set_auth_cookies(response, auth_google_usecase.access_token, auth_google_usecase.refresh_token)
         return auth_google_usecase
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Помилка сервера: {str(exc)}")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Google authentication failed")
+    except Exception:
+        logger.exception("Unexpected error during Google auth")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @auth_router.post("/refresh", response_model=TokenRefreshResponseSchema)
@@ -107,18 +107,19 @@ async def refresh_tokens(
     if not refresh_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Refresh token не знайдений",
+            detail="Refresh token is missing",
         )
 
     try:
         usecase = RefreshTokenUseCase(protocol, jwt_token_service)
         tokens = await usecase(refresh_token)
         set_auth_cookies(response, tokens.access_token, tokens.refresh_token)
-        return {"detail": "Токени успішно оновлено"}
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc))
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Помилка сервера: {str(exc)}")
+        return {"detail": "Tokens refreshed successfully"}
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+    except Exception:
+        logger.exception("Unexpected error during token refresh")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @auth_router.post("/logout")
