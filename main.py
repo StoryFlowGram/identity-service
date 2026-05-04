@@ -25,3 +25,8 @@ app.include_router(internal_router)
 app.dependency_overrides[depends.get_user_protocol] = di.get_user_protocol
 app.dependency_overrides[depends.get_jwt_token_service] = di.get_jwt_token_service
 app.dependency_overrides[depends.get_oauth_service] = di.get_oauth_service
+
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "service": "identity-service"}
