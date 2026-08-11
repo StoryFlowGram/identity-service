@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column, validates
 from sqlalchemy import func, CheckConstraint
-from sqlalchemy.types import Integer, BigInteger, String, DateTime
+from sqlalchemy.types import Boolean, Integer, BigInteger, String, DateTime
 from app.infrastructure.database.base import Base
 
 
@@ -15,6 +15,12 @@ class User(Base):
     username: Mapped[str] = mapped_column(String, nullable=True)
     avatar_url: Mapped[str] = mapped_column(String, nullable=True)
     token_version: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    notifications_enabled: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+        server_default="true",
+    )
     registred_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())  
     
     

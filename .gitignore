@@ -26,6 +26,8 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+k8s/base/shared
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
@@ -207,3 +209,5 @@ todo
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+# Ignore k8s secrets
+k8s/**/secret.yaml

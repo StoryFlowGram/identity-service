@@ -97,6 +97,14 @@ async def auth_via_google_popup(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
+@auth_router.get("/google/client-id")
+async def get_google_client_id():
+    client_id = config.google.google_client_id.strip()
+    if not client_id:
+        raise HTTPException(status_code=503, detail="Google client ID is not configured")
+    return {"client_id": client_id}
+
+
 @auth_router.post("/refresh", response_model=TokenRefreshResponseSchema)
 async def refresh_tokens(
     response: Response,

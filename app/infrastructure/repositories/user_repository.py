@@ -89,6 +89,22 @@ class UserRepository(AbstractUserProtocol):
         if not orm:
             return None
         return orm_to_domain(orm)
+
+    async def update_notifications_enabled(self, user_id: int, enabled: bool):
+        stmt = (
+            update(UserModel)
+            .where(UserModel.id == user_id)
+            .values(notifications_enabled=enabled)
+        )
+        await self.session_factory.execute(stmt)
+        await self.session_factory.commit()
+
+        stmt_select = select(UserModel).where(UserModel.id == user_id)
+        result = await self.session_factory.execute(stmt_select)
+        orm = result.scalars().one_or_none()
+        if not orm:
+            return None
+        return orm_to_domain(orm)
     
     async def delete(self, id_pk: int):
         stmt = delete(UserModel).where(UserModel.id == id_pk)

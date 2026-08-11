@@ -14,3 +14,4 @@ class User:
     username: Optional[str]
     avatar_url: Optional[str]
     token_version: int = 0
+    notifications_enabled: bool = True

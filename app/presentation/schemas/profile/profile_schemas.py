@@ -10,5 +10,6 @@ class ProfileSchema(BaseModel):
     last_name: Optional[str]
     username: Optional[str]
     avatar_url: Optional[str]
+    notifications_enabled: bool
 
     model_config = ConfigDict(from_attributes=True)

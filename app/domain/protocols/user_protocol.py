@@ -50,5 +50,9 @@ class AbstractUserProtocol(ABC):
         ...
 
     @abstractmethod
+    async def update_notifications_enabled(self, user_id: int, enabled: bool):
+        ...
+
+    @abstractmethod
     async def delete(self, id_pk: int):
         ...
